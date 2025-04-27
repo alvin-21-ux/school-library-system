@@ -1,0 +1,124 @@
+#include <stdio.h>
+#include <string.h>
+
+#define MAX_BOOKS 100
+#define MAX_LEN 100
+
+typedef struct {
+    char title[MAX_LEN];
+    char author[MAX_LEN];
+    int available; // 1 if available, 0 if borrowed
+} Book;
+
+Book library[MAX_BOOKS];
+int book_count = 0;
+
+// Function to add a book
+void addBook() {
+    if (book_count >= MAX_BOOKS) {
+        printf("Library is full! Cannot add more books.\n");
+        return;
+    }
+
+    printf("Enter book title: ");
+    getchar(); // to clear buffer
+    fgets(library[book_count].title, MAX_LEN, stdin);
+    library[book_count].title[strcspn(library[book_count].title, "\n")] = 0; // Remove newline
+
+    printf("Enter book author: ");
+    fgets(library[book_count].author, MAX_LEN, stdin);
+    library[book_count].author[strcspn(library[book_count].author, "\n")] = 0;
+
+    library[book_count].available = 1;
+    book_count++;
+
+    printf("Book added successfully!\n");
+}
+
+// Function to display all books
+void displayBooks() {
+    printf("\n--- Library Books ---\n");
+    for (int i = 0; i < book_count; i++) {
+        printf("%d. %s by %s [%s]\n", i + 1, library[i].title, library[i].author,
+               library[i].available ? "Available" : "Borrowed");
+    }
+}
+
+// Function to borrow a book
+void borrowBook() {
+    char id_card[20];
+
+    printf("Enter your School ID Card Number: ");
+    scanf("%s", id_card);
+
+    // Simple check for valid ID format (e.g., starts with 'RV' for Rift Valley)
+    if (strncmp(id_card, "RV", 2) != 0) {
+        printf("Invalid ID Card! Borrowing not allowed.\n");
+        return;
+    }
+
+    displayBooks();
+    printf("Enter the book number you want to borrow: ");
+    int book_num;
+    scanf("%d", &book_num);
+
+    if (book_num < 1 || book_num > book_count) {
+        printf("Invalid book number.\n");
+        return;
+    }
+
+    if (library[book_num - 1].available == 0) {
+        printf("Sorry, this book is already borrowed.\n");
+    } else {
+        library[book_num - 1].available = 0;
+        printf("Book borrowed successfully! Enjoy reading.\n");
+    }
+}
+
+// Function to return a book
+void returnBook() {
+    displayBooks();
+    printf("Enter the book number you want to return: ");
+    int book_num;
+    scanf("%d", &book_num);
+
+    if (book_num < 1 || book_num > book_count) {
+        printf("Invalid book number.\n");
+        return;
+    }
+
+    if (library[book_num - 1].available == 1) {
+        printf("This book was not borrowed.\n");
+    } else {
+        library[book_num - 1].available = 1;
+        printf("Book returned successfully! Thank you.\n");
+    }
+}
+
+// Main function
+int main() {
+    int choice;
+
+    do {
+        printf("\n--- Library Management System ---\n");
+        printf("1. Add Book\n");
+        printf("2. Display Books\n");
+        printf("3. Borrow Book\n");
+        printf("4. Return Book\n");
+        printf("5. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1: addBook(); break;
+            case 2: displayBooks(); break;
+            case 3: borrowBook(); break;
+            case 4: returnBook(); break;
+            case 5: printf("Thank you for using the library system!\n"); break;
+            default: printf("Invalid choice! Please try again.\n");
+        }
+
+    } while (choice != 5);
+
+    return 0;
+}
